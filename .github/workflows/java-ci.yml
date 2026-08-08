@@ -1,18 +1,21 @@
-name: Java CI
+name: Java CI Practice
 
 on:
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -22,8 +25,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Show Java version
+        run: java -version
+
+      - name: Show current directory
+        run: pwd
+
+      - name: Show project files
+        run: ls -la
+
       - name: Compile Java
         run: javac App.java
 
       - name: Run Java application
         run: java App
+
+      - name: Build completed
+        run: echo "GitHub Actions CI build completed successfully!"
