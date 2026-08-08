@@ -16,6 +16,9 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    outputs:
+      app_name: ${{ steps.build_info.outputs.app_name }}
+      build_status: ${{ steps.build_info.outputs.build_status }}
 
     steps:
 
@@ -45,37 +48,47 @@ jobs:
 
       - name: Build completed
         run: echo "GitHub Actions CI build completed successfully!"
-
-
-  test:
+      - name: Create build information
+        id: build_info
+        run: |
+          echo "app_name=JavaApp" >> "$GITHUB_OUTPUT"
+          echo "build_status=SUCCESS" >> "$GITHUB_OUTPUT"
+    test:
     runs-on: ubuntu-latest
 
     needs: build
 
-    steps:
+  steps:
+    - name: Test message
+      run: echo "Test job started"
 
-      - name: Test message
-        run: echo "Test job started"
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: Check Java
-        run: java -version
+    - name: Check Java
+      run: java -version
 
-      - name: Test completed
-        run: echo "Test job completed successfully"
+    - name: Test completed
+      run: echo "Test job completed successfully"
 
-  report:
-    runs-on: ubuntu-latest
+report:
+  runs-on: ubuntu-latest
 
-    needs: test
+  needs: [build, test]
 
-    if: always()
+  if: always()
 
-    steps:
-      - name: Report started
-        run: echo "Reporting job started"
+  steps:
+    - name: Report started
+      run: echo "Reporting job started"
 
-      - name: Show test result
-        run: echo "Test job finished"
+    - name: Show build information
+      run: |
+        echo "Application: ${{ needs.build.outputs.app_name }}"
+        echo "Build Status: ${{ needs.build.outputs.build_status }}"
 
-      - name: Report completed
-        run: echo "Reporting completed even if test failed"
+    - name: Report completed
+      run: echo "Reporting job completed successfully"
